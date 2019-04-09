@@ -1,0 +1,25 @@
+global: 
+  smtp_smarthost: 'smtp.mailgun.org:2525'
+  smtp_from: 'alertas@treinamento.eftech.com.br'
+  smtp_auth_identity: 'alertas@treinamento.eftech.com.br'
+  smtp_require_tls: true
+templates: 
+- "/etc/alertmanager/template/*.tmpl"
+route: 
+  repeat_interval: 1m
+  receiver: operations-team
+receivers: 
+- name: 'operations-team'
+  email_configs: 
+  - to: 'eduardo@fametec.com.br'
+    auth_username: 'alertas@treinamento.eftech.com.br'
+    auth_password: 'qaz..123'
+    send_resolved: true
+  slack_configs: 
+  - api_url: https://hooks.slack.com/services/ABC/DEF/GHI
+    channel: '#prometheus'
+    send_resolved: true
+  webhook_configs: 
+  - send_resolved: true
+    url: http://alertmanager-bot:8081
+

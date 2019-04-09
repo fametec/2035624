@@ -1,0 +1,72 @@
+version: '3.2'
+services:
+   prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    ports:
+    - 9090:9090
+    command:
+    - --config.file=/etc/prometheus/prometheus.yml
+    volumes:
+    - ./prometheus/:/etc/prometheus/:ro
+    depends_on:
+    - cadvisor
+    - node_exporter
+    - alertmanager
+   cadvisor:
+    image: google/cadvisor:latest
+    container_name: cadvisor
+    ports:
+    - 8080:8080
+    volumes:
+    - /:/rootfs:ro
+    - /var/run:/var/run:rw
+    - /sys:/sys:ro
+    - /var/lib/docker/:/var/lib/docker:ro
+    cap_add: 
+    - SYS_TIME
+    depends_on:
+    - redis
+   redis:
+    image: redis:latest
+    container_name: redis
+    ports:
+    - 6379:6379
+   node_exporter: 
+    image: quay.io/prometheus/node-exporter
+    container_name: node_exporter
+    pid: "host"
+    volumes: 
+    - /:/host:ro,rslave
+    ports: 
+    - 9100:9100
+    cap_add: 
+    - SYS_TIME
+   alertmanager: 
+    image: quay.io/prometheus/alertmanager
+    container_name: alertmanager
+    volumes: 
+    - ./alertmanager/:/etc/alertmanager/:ro
+    ports: 
+    - 9093:9093
+    command: 
+    - --config.file=/etc/alertmanager/alertmanager.yml
+   alertmanager-bot:
+    image: metalmatze/alertmanager-bot:0.4.0
+    container_name: alertmanager-bot
+    depends_on:
+    - alertmanager
+    environment:
+      LISTEN_ADDR: 0.0.0.0:8081
+      ALERTMANAGER_URL: http://alertmanager:9093
+      BOLT_PATH: /data/bot.db
+      STORE: bolt
+      TELEGRAM_ADMIN: '222222222'
+      TELEGRAM_TOKEN: 555555555:dddddddddddddddddddddddd
+      TEMPLATE_PATHS: /templates/default.tmpl
+    ports:
+    - 8081:8081
+    volumes:
+    - alertmanager-bot-volume:/data
+volumes:
+  alertmanager-bot-volume:
