@@ -14,6 +14,7 @@ services:
     - 9090:9090
     command:
     - --config.file=/etc/prometheus/prometheus.yml 
+    - --web.external-url=http://web/prometheus/
     volumes:
     - ./prometheus/:/etc/prometheus/:ro
     depends_on:
@@ -105,9 +106,14 @@ services:
     ports:
     - 3000:3000
     environment:
-      GF_SERVER_ROOT_URL: https://grafana.fametec.com.br
+      GF_SERVER_DOMAIN: localhost:3000
+      GF_SERVER_ROOT_URL: http://localhost:3000/grafana/
+      GF_AUTH_BASIC_ENABLED: "true"
+      GF_AUTH_PROXY_ENABLED: "true"
+      GF_AUTH_PROXY_HEADER_NAME: "X-WEBAUTH-USER"
+      GR_USERS_ALLOW_SIGN_UP: "false"
       GF_SECURITY_ADMIN_PASSWORD: secret
-      GF_INSTALL_PLUGINS: grafana-clock-panel,grafana-simple-json-datasource,raintank-worldping-app
+      GF_INSTALL_PLUGINS: grafana-clock-panel,grafana-simple-json-datasource
 #
 # Nginx 
 #
