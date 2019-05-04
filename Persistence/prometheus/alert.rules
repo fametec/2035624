@@ -1,0 +1,12 @@
+groups: 
+- name: opearations-team
+  rules: 
+  - alert: InstanceDown
+    expr: up == 0
+    # down = 0 ; up = 1
+    for: 30s
+    labels: 
+     severity: page
+    annotations: 
+     summary: Instance {{ $labels.instance }} down"
+     description: "{{ $labels.instance }} of job {{ $labels.job }} has been down for more than 30s."
