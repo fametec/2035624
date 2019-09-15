@@ -10,3 +10,12 @@ groups:
     annotations: 
      summary: Instance {{ $labels.instance }} down"
      description: "{{ $labels.instance }} of job {{ $labels.job }} has been down for more than 30s."
+#     
+  - alert: MemoryUsage80
+    expr: (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes * 100) < 30
+    for: 1m
+    labels:
+     severity: critical
+    annotations:
+     description: '{{ $labels.instance }} has free memory (current value: {{ $value  }}%).'
+     summary: Insufficent free Memory on {{ $labels.instance }}
